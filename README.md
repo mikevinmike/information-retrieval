@@ -1,7 +1,7 @@
 # information-retrieval
 
 based on http://users.dsic.upv.es/~pgupta/terrier_tut/
-- if an error occurs check if terrier-3.5/var/index/tut is removed
+- if an error occurs check if directory 'index' is removed
 
 check class InformationRetrieval, and the execution of printPostingsOfInvertedIndex() which should contain all relevant data for assignment 1
 
