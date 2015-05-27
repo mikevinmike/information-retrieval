@@ -18,6 +18,7 @@ public class Indexing {
 	static String terrier_home;
 	static String path_to_data;
 	static String lang;
+	String indexPath;
 	
 	public static Indexing create() throws IOException {
 		
@@ -32,12 +33,13 @@ public class Indexing {
 		Indexing index = new Indexing();
 		index.terrier = new TerrierWrapper(terrier_home);
 		
+		// This is the place where the index will be created
+		index.indexPath = pathName + "/index";
+		
 		return index;
 	}
 	public void loadIndex() throws IOException { 
 		
-		// This is the place where the index will be created
-		String indexPath = terrier_home+"/var/index/tut/";
 		// Prefix is useful where there will be multiple indexes at the same directory for example, 
 		// different languages.
 		String prefix = "en";
