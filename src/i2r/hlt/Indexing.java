@@ -34,7 +34,7 @@ public class Indexing {
 		index.terrier = new TerrierWrapper(terrier_home);
 		
 		// This is the place where the index will be created
-		index.indexPath = pathName + "/index";
+		index.indexPath = pathName + "/index/";
 		
 		return index;
 	}
