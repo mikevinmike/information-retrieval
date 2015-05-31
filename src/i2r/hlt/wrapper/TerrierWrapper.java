@@ -59,6 +59,9 @@ import org.terrier.terms.WeakPorterStemmer;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import antlr.TokenStreamSelector;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.util.Collections;
 
 /** This class is the wrapper on top of terrier API. 
  * Use it for the most of IR related needs.
@@ -916,16 +919,47 @@ public class TerrierWrapper {
 		InvertedIndex inv = index.getInvertedIndex();
 		MetaIndex meta = index.getMetaIndex();
 		Lexicon<String> lex = index.getLexicon();
+                List<String> vocabularyList = new ArrayList<String>();
+                BufferedWriter bwriterPL = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("postingList.txt")));
+                bwriterPL.write("Postings List");
+                bwriterPL.newLine();
+                bwriterPL.write("-----------------------------------------------------");
+                bwriterPL.newLine();
+                bwriterPL.write("|Term:|Term Number|Document Frequency|Term Frequency|");
+                bwriterPL.newLine();
+                bwriterPL.write("-----------------------------------------------------");
+                bwriterPL.newLine();
 		for(int lexiconIndex = 0; lexiconIndex < lex.numberOfEntries(); lexiconIndex++) {
 			Entry<String, LexiconEntry> le = lex.getLexiconEntry(lexiconIndex);
 			IterablePosting postings = inv.getPostings((BitIndexPointer) le.getValue());
 			System.out.println("-------------------------");
-			System.out.println("entry " + le.getKey());
+			System.out.println("entry " + le.getKey() + " Postings: " + le.getValue());
+                        bwriterPL.write(le.getKey() + ": " + le.getValue());
+                        bwriterPL.newLine();
+                        vocabularyList.add(le.getKey());
 			while (postings.next() != IterablePosting.EOL) {
 				String docno = meta.getItem("docno", postings.getId());
 				System.out.println(docno + " with frequency " + postings.getFrequency());
+                                bwriterPL.write("Document#: " + docno + " - Termfrequency: " + postings.getFrequency());
+                                bwriterPL.newLine();
 			}
+                        bwriterPL.newLine();
 		}
+                bwriterPL.close();
+                Collections.sort(vocabularyList);
+                BufferedWriter bwriterDF = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("dictionaryFile.txt")));
+                System.out.println("Dictionary File (will be exported as a .txt-file):");
+                System.out.println("++++++++++++++++++++++++++++");
+                bwriterDF.write("Dictionary File (sorted)");
+                bwriterDF.newLine();
+                bwriterDF.write("++++++++++++++++++++++++++++");
+                bwriterDF.newLine();
+                for(int i=0;i<vocabularyList.size();i++){
+                    System.out.println(vocabularyList.get(i));
+                    bwriterDF.write(vocabularyList.get(i));
+                    bwriterDF.newLine();
+                }
+                bwriterDF.close();
 	}
 	
 	/** Generates a map of terms in the document and its within document term frequencies.
