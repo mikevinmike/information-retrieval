@@ -59,6 +59,9 @@ import org.terrier.terms.WeakPorterStemmer;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import antlr.TokenStreamSelector;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.util.Collections;
 
 /** This class is the wrapper on top of terrier API. 
  * Use it for the most of IR related needs.
@@ -916,16 +919,26 @@ public class TerrierWrapper {
 		InvertedIndex inv = index.getInvertedIndex();
 		MetaIndex meta = index.getMetaIndex();
 		Lexicon<String> lex = index.getLexicon();
+                List<String> vocabularyList = new ArrayList<String>();
 		for(int lexiconIndex = 0; lexiconIndex < lex.numberOfEntries(); lexiconIndex++) {
 			Entry<String, LexiconEntry> le = lex.getLexiconEntry(lexiconIndex);
 			IterablePosting postings = inv.getPostings((BitIndexPointer) le.getValue());
 			System.out.println("-------------------------");
-			System.out.println("entry " + le.getKey());
+			System.out.println("entry " + le.getKey() + " Postings: " + le.getValue());
+                        vocabularyList.add(le.getKey());
 			while (postings.next() != IterablePosting.EOL) {
 				String docno = meta.getItem("docno", postings.getId());
 				System.out.println(docno + " with frequency " + postings.getFrequency());
 			}
 		}
+                Collections.sort(vocabularyList);
+                BufferedWriter bwriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("dictionary.txt")));
+                for(int i=0;i<vocabularyList.size();i++){
+                    System.out.println(vocabularyList.get(i));
+                    bwriter.write(vocabularyList.get(i));
+                    bwriter.newLine();
+                }
+                bwriter.close();
 	}
 	
 	/** Generates a map of terms in the document and its within document term frequencies.
